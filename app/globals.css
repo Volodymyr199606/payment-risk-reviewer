@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f1f5f9;
+  /* Slightly cooler canvas so white cards read more “elevated” */
+  --background: #e8edf3;
   --foreground: #0f172a;
   --surface: #ffffff;
-  --surface-muted: #f8fafc;
-  --border-subtle: rgb(226 232 240 / 0.9);
-  --border-strong: rgb(203 213 225 / 0.95);
+  --surface-muted: #f1f5f9;
+  --border-subtle: rgb(203 213 225 / 0.95);
+  --border-strong: rgb(148 163 184 / 0.45);
 }
 
 @theme inline {

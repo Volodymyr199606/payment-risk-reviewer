@@ -13,5 +13,4 @@ export const defaultReviewRequest: TransactionReviewRequest = {
   accountAgeDays: 2,
   priorDisputeCount: 1,
   velocity24hCount: 6,
-  notes: "",
 };

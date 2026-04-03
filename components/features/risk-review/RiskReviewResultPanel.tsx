@@ -4,8 +4,6 @@ import { ReviewOutcomeSection } from "@/components/features/risk-review/ReviewOu
 import { FlaggedSignalsCard } from "@/components/features/risk-review/FlaggedSignalsCard";
 import { AnalystSummaryCard } from "@/components/features/risk-review/AnalystSummaryCard";
 import { ConfidenceCard } from "@/components/features/risk-review/ConfidenceCard";
-import { SectionLabel } from "@/components/ui/section-label";
-
 export function RiskReviewResultPanel({ result }: { result: RiskReviewResult }) {
   const { meta } = result;
   return (
@@ -17,10 +15,7 @@ export function RiskReviewResultPanel({ result }: { result: RiskReviewResult }) 
 
       <FlaggedSignalsCard signals={result.flaggedSignals} />
 
-      <div className="space-y-3">
-        <SectionLabel>Transaction context</SectionLabel>
-        <TransactionSummaryCard transaction={result.transaction} />
-      </div>
+      <TransactionSummaryCard transaction={result.transaction} />
 
       <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2 lg:gap-8 lg:items-start">
         <AnalystSummaryCard text={result.analystSummary} />

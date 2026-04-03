@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { PaymentChannel, TransactionReviewRequest } from "@/types/review";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { defaultReviewRequest } from "@/components/features/risk-review/defaults";
 
@@ -51,9 +50,25 @@ function parseRequest(
     accountAgeDays,
     priorDisputeCount,
     velocity24hCount,
-    notes: raw.notes.trim() ? raw.notes.trim() : undefined,
   };
   return { ok: true, value };
+}
+
+function FieldGroup({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="space-y-2.5">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+        {title}
+      </p>
+      {children}
+    </div>
+  );
 }
 
 export function TransactionReviewForm({
@@ -76,7 +91,6 @@ export function TransactionReviewForm({
     accountAgeDays: String(d.accountAgeDays),
     priorDisputeCount: String(d.priorDisputeCount),
     velocity24hCount: String(d.velocity24hCount),
-    notes: d.notes ?? "",
   });
 
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -94,186 +108,195 @@ export function TransactionReviewForm({
 
   return (
     <Card variant="default">
-      <p className="text-sm font-semibold text-slate-800">Transaction details</p>
-      <p className="mt-1 text-xs leading-relaxed text-slate-500">
-        Evaluation runs server-side (rules-first). Currency and countries use
-        standard codes.
+      <p className="text-base font-semibold text-slate-900">Transaction details</p>
+      <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
+        Server-side rules-first evaluation. Use standard currency and country codes.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="transactionId">Transaction ID</Label>
-            <Input
-              id="transactionId"
-              value={fields.transactionId}
-              onChange={(e) =>
-                setFields((f) => ({ ...f, transactionId: e.target.value }))
-              }
-              disabled={disabled}
-              autoComplete="off"
-            />
+      <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+        <FieldGroup title="Reference">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="transactionId">Transaction ID</Label>
+              <Input
+                id="transactionId"
+                value={fields.transactionId}
+                onChange={(e) =>
+                  setFields((f) => ({ ...f, transactionId: e.target.value }))
+                }
+                disabled={disabled}
+                autoComplete="off"
+              />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="amount">Amount</Label>
-            <Input
-              id="amount"
-              type="number"
-              step="0.01"
-              min="0"
-              value={fields.amount}
-              onChange={(e) =>
-                setFields((f) => ({ ...f, amount: e.target.value }))
-              }
-              disabled={disabled}
-            />
+        </FieldGroup>
+
+        <FieldGroup title="Amount">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="amount">Amount</Label>
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                value={fields.amount}
+                onChange={(e) =>
+                  setFields((f) => ({ ...f, amount: e.target.value }))
+                }
+                disabled={disabled}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="currency">Currency</Label>
+              <Input
+                id="currency"
+                value={fields.currency}
+                onChange={(e) =>
+                  setFields((f) => ({
+                    ...f,
+                    currency: e.target.value.toUpperCase(),
+                  }))
+                }
+                maxLength={3}
+                disabled={disabled}
+              />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="currency">Currency</Label>
-            <Input
-              id="currency"
-              value={fields.currency}
-              onChange={(e) =>
-                setFields((f) => ({
-                  ...f,
-                  currency: e.target.value.toUpperCase(),
-                }))
-              }
-              maxLength={3}
-              disabled={disabled}
-            />
+        </FieldGroup>
+
+        <FieldGroup title="Merchant">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="merchantName">Merchant name</Label>
+              <Input
+                id="merchantName"
+                value={fields.merchantName}
+                onChange={(e) =>
+                  setFields((f) => ({ ...f, merchantName: e.target.value }))
+                }
+                disabled={disabled}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="merchantCategoryCode">Category (MCC)</Label>
+              <Input
+                id="merchantCategoryCode"
+                value={fields.merchantCategoryCode}
+                onChange={(e) =>
+                  setFields((f) => ({
+                    ...f,
+                    merchantCategoryCode: e.target.value,
+                  }))
+                }
+                disabled={disabled}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="channel">Channel</Label>
+              <Select
+                id="channel"
+                value={fields.channel}
+                onChange={(e) =>
+                  setFields((f) => ({
+                    ...f,
+                    channel: e.target.value as PaymentChannel,
+                  }))
+                }
+                disabled={disabled}
+              >
+                <option value="ecommerce">E-commerce</option>
+                <option value="pos">POS</option>
+                <option value="unknown">Unknown</option>
+              </Select>
+            </div>
           </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="merchantName">Merchant name</Label>
-            <Input
-              id="merchantName"
-              value={fields.merchantName}
-              onChange={(e) =>
-                setFields((f) => ({ ...f, merchantName: e.target.value }))
-              }
-              disabled={disabled}
-            />
+        </FieldGroup>
+
+        <FieldGroup title="Geography">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="cardholderCountry">Cardholder country</Label>
+              <Input
+                id="cardholderCountry"
+                value={fields.cardholderCountry}
+                onChange={(e) =>
+                  setFields((f) => ({
+                    ...f,
+                    cardholderCountry: e.target.value.toUpperCase(),
+                  }))
+                }
+                maxLength={2}
+                disabled={disabled}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="merchantCountry">Merchant country</Label>
+              <Input
+                id="merchantCountry"
+                value={fields.merchantCountry}
+                onChange={(e) =>
+                  setFields((f) => ({
+                    ...f,
+                    merchantCountry: e.target.value.toUpperCase(),
+                  }))
+                }
+                maxLength={2}
+                disabled={disabled}
+              />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="merchantCategoryCode">Category (MCC)</Label>
-            <Input
-              id="merchantCategoryCode"
-              value={fields.merchantCategoryCode}
-              onChange={(e) =>
-                setFields((f) => ({
-                  ...f,
-                  merchantCategoryCode: e.target.value,
-                }))
-              }
-              disabled={disabled}
-            />
+        </FieldGroup>
+
+        <FieldGroup title="Behavioral signals">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="accountAgeDays">Account age (days)</Label>
+              <Input
+                id="accountAgeDays"
+                type="number"
+                min="0"
+                value={fields.accountAgeDays}
+                onChange={(e) =>
+                  setFields((f) => ({ ...f, accountAgeDays: e.target.value }))
+                }
+                disabled={disabled}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="priorDisputeCount">Prior disputes</Label>
+              <Input
+                id="priorDisputeCount"
+                type="number"
+                min="0"
+                value={fields.priorDisputeCount}
+                onChange={(e) =>
+                  setFields((f) => ({
+                    ...f,
+                    priorDisputeCount: e.target.value,
+                  }))
+                }
+                disabled={disabled}
+              />
+            </div>
+            <div className="space-y-1.5 sm:col-span-3 md:col-span-1">
+              <Label htmlFor="velocity24hCount">Velocity (24h)</Label>
+              <Input
+                id="velocity24hCount"
+                type="number"
+                min="0"
+                value={fields.velocity24hCount}
+                onChange={(e) =>
+                  setFields((f) => ({
+                    ...f,
+                    velocity24hCount: e.target.value,
+                  }))
+                }
+                disabled={disabled}
+              />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="channel">Channel</Label>
-            <Select
-              id="channel"
-              value={fields.channel}
-              onChange={(e) =>
-                setFields((f) => ({
-                  ...f,
-                  channel: e.target.value as PaymentChannel,
-                }))
-              }
-              disabled={disabled}
-            >
-              <option value="ecommerce">E-commerce</option>
-              <option value="pos">POS</option>
-              <option value="unknown">Unknown</option>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="cardholderCountry">Cardholder country</Label>
-            <Input
-              id="cardholderCountry"
-              value={fields.cardholderCountry}
-              onChange={(e) =>
-                setFields((f) => ({
-                  ...f,
-                  cardholderCountry: e.target.value.toUpperCase(),
-                }))
-              }
-              maxLength={2}
-              disabled={disabled}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="merchantCountry">Merchant country</Label>
-            <Input
-              id="merchantCountry"
-              value={fields.merchantCountry}
-              onChange={(e) =>
-                setFields((f) => ({
-                  ...f,
-                  merchantCountry: e.target.value.toUpperCase(),
-                }))
-              }
-              maxLength={2}
-              disabled={disabled}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="accountAgeDays">Account age (days)</Label>
-            <Input
-              id="accountAgeDays"
-              type="number"
-              min="0"
-              value={fields.accountAgeDays}
-              onChange={(e) =>
-                setFields((f) => ({ ...f, accountAgeDays: e.target.value }))
-              }
-              disabled={disabled}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="priorDisputeCount">Prior disputes</Label>
-            <Input
-              id="priorDisputeCount"
-              type="number"
-              min="0"
-              value={fields.priorDisputeCount}
-              onChange={(e) =>
-                setFields((f) => ({
-                  ...f,
-                  priorDisputeCount: e.target.value,
-                }))
-              }
-              disabled={disabled}
-            />
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="velocity24hCount">Velocity (24h count)</Label>
-            <Input
-              id="velocity24hCount"
-              type="number"
-              min="0"
-              value={fields.velocity24hCount}
-              onChange={(e) =>
-                setFields((f) => ({
-                  ...f,
-                  velocity24hCount: e.target.value,
-                }))
-              }
-              disabled={disabled}
-            />
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="notes">Notes (optional)</Label>
-            <Textarea
-              id="notes"
-              value={fields.notes}
-              onChange={(e) =>
-                setFields((f) => ({ ...f, notes: e.target.value }))
-              }
-              disabled={disabled}
-              placeholder="Internal notes — not used for scoring in MVP"
-            />
-          </div>
-        </div>
+        </FieldGroup>
 
         {validationError ? (
           <p className="text-sm text-red-700" role="status">
@@ -281,8 +304,8 @@ export function TransactionReviewForm({
           </p>
         ) : null}
 
-        <div className="flex flex-wrap gap-3 pt-2">
-          <Button type="submit" disabled={disabled}>
+        <div className="mt-1 flex justify-end border-t border-slate-200/90 pt-4">
+          <Button type="submit" disabled={disabled} className="min-w-[180px]">
             {disabled ? "Evaluating…" : "Run risk review"}
           </Button>
         </div>

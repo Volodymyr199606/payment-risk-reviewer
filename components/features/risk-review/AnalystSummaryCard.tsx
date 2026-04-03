@@ -3,8 +3,14 @@ import { Card } from "@/components/ui/card";
 export function AnalystSummaryCard({ text }: { text: string }) {
   return (
     <Card variant="muted" className="h-full p-5 sm:p-6">
-      <p className="text-xs font-semibold text-slate-700">Analyst summary</p>
-      <p className="mt-3 text-sm leading-[1.65] text-slate-700">{text}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+        Analyst summary
+      </p>
+      <div className="mt-4 border-l-2 border-slate-300/90 pl-4">
+        <p className="text-[15px] font-normal leading-[1.7] text-slate-800">
+          {text}
+        </p>
+      </div>
     </Card>
   );
 }

@@ -40,12 +40,12 @@ export function RiskReviewExperience() {
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-      <header className="border-b border-slate-200/80 pb-10">
+      <header className="border-b border-slate-300/80 pb-10">
         <SectionLabel>Payment Risk Reviewer</SectionLabel>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2rem] sm:leading-tight">
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-[2.125rem] sm:leading-[1.15]">
           Transaction risk review
         </h1>
-        <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-slate-600">
+        <p className="mt-4 max-w-2xl text-[15px] font-medium leading-relaxed text-slate-600">
           Enter transaction context for a deterministic rules assessment. The
           outcome highlights recommended action, risk level, and signals before
           supporting detail.

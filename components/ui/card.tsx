@@ -6,11 +6,11 @@ type CardVariant = "default" | "muted" | "emphasis";
 
 const variantClass: Record<CardVariant, string> = {
   default:
-    "rounded-xl border border-slate-200/90 bg-[var(--surface)] p-6 shadow-sm shadow-slate-900/5",
+    "rounded-xl border border-slate-300/90 bg-[var(--surface)] p-6 shadow-md shadow-slate-900/[0.07]",
   muted:
-    "rounded-xl border border-slate-200/70 bg-[var(--surface-muted)] p-5 shadow-sm shadow-slate-900/[0.02]",
+    "rounded-xl border border-slate-200/90 bg-[var(--surface-muted)] p-5 shadow-sm shadow-slate-900/[0.04]",
   emphasis:
-    "rounded-2xl border border-slate-200/95 bg-[var(--surface)] p-6 shadow-md shadow-slate-900/[0.06] ring-1 ring-slate-900/[0.04]",
+    "rounded-2xl border border-slate-300/95 bg-[var(--surface)] p-6 shadow-lg shadow-slate-900/[0.08] ring-1 ring-slate-900/[0.05]",
 };
 
 export function Card({
