@@ -2,6 +2,7 @@ import type { FlaggedSignal } from "@/types/review";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
+import { cn } from "@/lib/utils";
 
 function severityVariant(
   s: FlaggedSignal["severity"],
@@ -9,6 +10,12 @@ function severityVariant(
   if (s === "critical") return "danger";
   if (s === "warning") return "warning";
   return "neutral";
+}
+
+function rowAccent(s: FlaggedSignal["severity"]): string {
+  if (s === "critical") return "bg-rose-500";
+  if (s === "warning") return "bg-amber-400";
+  return "bg-sky-400";
 }
 
 export function FlaggedSignalsCard({
@@ -22,13 +29,13 @@ export function FlaggedSignalsCard({
     <div className="space-y-2.5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <SectionLabel>Flagged signals</SectionLabel>
-        <span className="text-[11px] font-medium tabular-nums text-slate-500">
+        <span className="text-[11px] font-medium tabular-nums text-sky-800/80">
           {count === 0 ? "None" : `${count} active`}
         </span>
       </div>
-      <Card variant="emphasis" className="p-4 sm:p-5">
+      <Card variant="emphasis" className="p-0 sm:p-0">
         {count === 0 ? (
-          <p className="text-sm leading-relaxed text-slate-600">
+          <p className="p-4 text-sm leading-relaxed text-slate-600 sm:p-5">
             No rule-based signals fired for this transaction. Continue to
             monitor velocity and dispute patterns outside this review.
           </p>
@@ -37,22 +44,31 @@ export function FlaggedSignalsCard({
             {signals.map((s) => (
               <li
                 key={s.code}
-                className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1 py-2.5 first:pt-0 last:pb-0"
+                className="group flex gap-3 px-3 py-2 transition-colors duration-150 hover:bg-slate-50/80 sm:px-4 sm:py-2.5"
               >
-                <div className="min-w-0 flex-1">
-                  <p className="text-[13px] font-semibold leading-snug text-slate-900">
-                    {s.label}
-                  </p>
-                  <p className="mt-0.5 font-mono text-[10px] text-slate-400">
-                    {s.code}
-                  </p>
+                <span
+                  className={cn(
+                    "mt-1.5 h-8 w-1 shrink-0 rounded-full",
+                    rowAccent(s.severity),
+                  )}
+                  aria-hidden
+                />
+                <div className="flex min-w-0 flex-1 flex-wrap items-start justify-between gap-2 sm:items-center">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold leading-snug text-slate-900">
+                      {s.label}
+                    </p>
+                    <p className="mt-0.5 font-mono text-[10px] tracking-tight text-slate-400/90">
+                      {s.code}
+                    </p>
+                  </div>
+                  <Badge
+                    variant={severityVariant(s.severity)}
+                    className="h-5 shrink-0 px-1.5 py-0 text-[9px] font-semibold uppercase tracking-wider"
+                  >
+                    {s.severity}
+                  </Badge>
                 </div>
-                <Badge
-                  variant={severityVariant(s.severity)}
-                  className="shrink-0 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-                >
-                  {s.severity}
-                </Badge>
               </li>
             ))}
           </ul>

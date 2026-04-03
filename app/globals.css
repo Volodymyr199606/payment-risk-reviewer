@@ -1,13 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  /* Slightly cooler canvas so white cards read more “elevated” */
-  --background: #e8edf3;
+  --background: #e4eaf2;
   --foreground: #0f172a;
   --surface: #ffffff;
-  --surface-muted: #f1f5f9;
+  --surface-muted: #f0f4f8;
   --border-subtle: rgb(203 213 225 / 0.95);
   --border-strong: rgb(148 163 184 / 0.45);
+  /* Semantic tokens — use with Tailwind classes in components */
+  --semantic-success: 16 185 129;
+  --semantic-warning: 245 158 11;
+  --semantic-danger: 225 29 72;
+  --semantic-info: 59 130 246;
 }
 
 @theme inline {

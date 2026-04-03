@@ -6,8 +6,8 @@ export function AnalystSummaryCard({ text }: { text: string }) {
       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
         Analyst summary
       </p>
-      <div className="mt-4 border-l-2 border-slate-300/90 pl-4">
-        <p className="text-[15px] font-normal leading-[1.7] text-slate-800">
+      <div className="mt-4 border-l-[3px] border-sky-400/70 bg-sky-50/30 pl-4 py-1">
+        <p className="text-[15px] font-normal leading-[1.75] text-slate-800">
           {text}
         </p>
       </div>
