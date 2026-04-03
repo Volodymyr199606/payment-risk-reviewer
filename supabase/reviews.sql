@@ -1,4 +1,6 @@
--- Run in Supabase SQL editor to enable persistence from POST /api/review
+-- Run once in Supabase: SQL Editor → New query → Paste → Run.
+-- Columns match lib/supabase/persist-review.ts insert shape.
+-- RLS is on; the Next.js API uses SUPABASE_SERVICE_ROLE_KEY (bypasses RLS). Anon clients have no policies yet.
 
 create table if not exists public.reviews (
   id uuid primary key default gen_random_uuid(),
