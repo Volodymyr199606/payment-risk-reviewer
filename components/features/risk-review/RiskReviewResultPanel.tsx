@@ -37,6 +37,7 @@ export function RiskReviewResultPanel({ result }: { result: RiskReviewResult }) 
         {" · "}
         {new Date(meta.evaluatedAt).toLocaleString()}
         {meta.explanationSource ? ` · ${meta.explanationSource}` : ""}
+        {meta.groqModel ? ` · ${meta.groqModel}` : ""}
         {meta.persistedReviewId
           ? ` · saved ${meta.persistedReviewId.slice(0, 8)}…`
           : ""}

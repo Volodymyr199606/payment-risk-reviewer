@@ -53,7 +53,10 @@ export interface RiskReviewResult {
     requestId: string;
     evaluatedAt: string;
     rulesVersion?: string;
+    /** Narrative from Groq when set; rules engine still owns risk/signals/recommendation. */
     explanationSource?: "rules" | "groq";
+    /** Present when Groq wrote `analystSummary` (for support / debugging). */
+    groqModel?: string;
     persistedReviewId?: string;
   };
 }

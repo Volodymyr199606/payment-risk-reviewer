@@ -5,14 +5,16 @@ const DEFAULT_MODEL = "llama-3.3-70b-versatile";
 
 export function isGroqEnabled(): boolean {
   return (
-    Boolean(process.env.GROQ_API_KEY) &&
+    Boolean(process.env.GROQ_API_KEY?.trim()) &&
     process.env.ENABLE_GROQ_EXPLANATION !== "false"
   );
 }
 
 /**
- * Optional narrative layer — must not change recommendation/risk enums from rules.
- * Falls back to caller's template summary on any failure.
+ * Optional narrative layer only. Rules engine outcome is frozen: this function
+ * must not change risk level, signals, or recommendation (those are not sent back
+ * to the client from here — only `analystSummary` text is substituted).
+ * Returns null on any failure → API uses template `outcome.analystSummary`.
  */
 export async function generateAnalystSummaryWithGroq(
   outcome: RulesOutcome,
@@ -20,32 +22,50 @@ export async function generateAnalystSummaryWithGroq(
   if (!isGroqEnabled()) return null;
 
   const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) return null;
+  if (!apiKey?.trim()) return null;
 
-  const model = process.env.GROQ_MODEL ?? DEFAULT_MODEL;
+  const model = process.env.GROQ_MODEL?.trim() || DEFAULT_MODEL;
   const client = new Groq({ apiKey });
 
-  const system = `You are a payment risk analyst assistant. Write a concise 2-4 sentence summary for an analyst.
-Rules:
-- Do NOT contradict the given risk level or recommendation.
-- Reference only the structured signals provided.
-- Professional, neutral tone. No markdown.`;
+  const system = `You are a senior payment risk analyst writing a short case note for internal review.
 
-  const user = JSON.stringify({
-    riskLevel: outcome.riskLevel,
-    recommendation: outcome.recommendation,
-    flaggedSignals: outcome.flaggedSignals,
-    confidence: outcome.confidence,
-  });
+Hard constraints (must follow):
+- The risk assessment is already decided by a rules engine. You are ONLY writing prose.
+- You MUST NOT change, contradict, or re-interpret: risk level, recommendation, or any flagged signals.
+- Do NOT invent new risk factors, merchants, amounts, or signals that are not in the JSON.
+- Do NOT suggest a different recommendation or risk tier than provided.
+- Write 2–4 sentences. Professional, neutral, plain text. No markdown, no bullet lists, no headings.`;
+
+  const userPayload = {
+    rulesVersion: outcome.rulesVersion,
+    frozenOutcome: {
+      riskLevel: outcome.riskLevel,
+      recommendation: outcome.recommendation,
+      flaggedSignals: outcome.flaggedSignals,
+      confidence: outcome.confidence,
+    },
+    contextForNarrativeOnly: {
+      transactionId: outcome.transaction.transactionId,
+      amount: outcome.transaction.amount,
+      currency: outcome.transaction.currency,
+      merchantName: outcome.transaction.merchantName,
+      channel: outcome.transaction.channel,
+    },
+  };
+
+  const user = JSON.stringify(userPayload, null, 0);
 
   try {
     const completion = await client.chat.completions.create({
       model,
-      temperature: 0.3,
-      max_tokens: 320,
+      temperature: 0.25,
+      max_tokens: 380,
       messages: [
         { role: "system", content: system },
-        { role: "user", content: user },
+        {
+          role: "user",
+          content: `Explain the assessment for an analyst. Use the frozen outcome exactly as authoritative. Data:\n${user}`,
+        },
       ],
     });
     const text = completion.choices[0]?.message?.content?.trim();

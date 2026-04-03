@@ -73,6 +73,7 @@ export async function POST(req: Request) {
       evaluatedAt: new Date().toISOString(),
       rulesVersion: outcome.rulesVersion,
       explanationSource,
+      ...(groqModel ? { groqModel } : {}),
       persistedReviewId: persistedId,
     },
   };
