@@ -43,7 +43,144 @@ Environment variables on Vercel configure the Groq API key and Supabase credenti
 
 ---
 
-## System diagram
+## Diagrams
+
+Mermaid diagrams render on GitHub. They summarize architecture, request flow, UI structure, and deployment.
+
+### High-level request flow
+
+The analyst uses the Next.js UI to submit transaction context; the app calls a server API route that validates input, runs the rules engine, optionally enriches with Groq, persists to Supabase, and returns one stable JSON payload mapped to result cards.
+
+```mermaid
+flowchart TD
+    subgraph Client
+        U[Analyst]
+        FE[Next.js frontend]
+        RC[Result cards]
+    end
+
+    subgraph Server["Next.js API (Vercel)"]
+        AR[API route]
+        V[Validate input]
+        RE[Rules engine]
+        MJ[Stable JSON response]
+    end
+
+    GQ[Groq API]
+    DB[(Supabase)]
+
+    U --> FE
+    FE -->|POST request| AR
+    AR --> V --> RE
+    RE -.->|optional| GQ
+    RE --> MJ
+    GQ --> MJ
+    MJ --> DB
+    MJ -->|JSON| FE
+    FE --> RC
+```
+
+### Request/response sequence (`POST /api/review`)
+
+This sequence shows the happy path: validate → rules → optional Groq → persist → structured JSON → UI.
+
+```mermaid
+sequenceDiagram
+    participant RA as Risk Analyst
+    participant FE as Next.js Frontend
+    participant AR as Next.js API Route
+    participant RE as Rules Engine
+    participant GQ as Groq API
+    participant SB as Supabase
+
+    RA->>FE: Enter transaction data
+    FE->>AR: POST /api/review (JSON body)
+    Note over AR: Validate input
+    AR->>RE: Evaluate(transaction context)
+    RE-->>AR: Risk level, signals, recommendation
+    opt Explanation enabled
+        AR->>GQ: Generate analyst explanation
+        GQ-->>AR: Explanation text
+    end
+    AR->>SB: Persist review (input + outcome)
+    SB-->>AR: Acknowledge write
+    AR-->>FE: 200 OK — structured JSON
+    FE-->>RA: Display result cards
+```
+
+### Rules-first evaluation logic
+
+Rules always produce risk level, signals, and recommendation; Groq only adds narrative text and does not override the core recommendation in the MVP.
+
+```mermaid
+flowchart TD
+    TI[Transaction input] --> V{Validate input}
+    V -->|Invalid| ERR[Validation error]
+    V -->|Valid| RE[Rules engine]
+
+    RE --> RL[Risk level]
+    RE --> FS[Flagged signals]
+    RE --> RA[Recommended action]
+
+    RL --> SRR[Structured review result]
+    FS --> SRR
+    RA --> SRR
+
+    SRR --> MERGE[Final response payload]
+    SRR --> G{Optional Groq?}
+    G -->|Yes| LLM[Groq: analyst explanation — narrative only]
+    LLM --> MERGE
+```
+
+### Frontend UI architecture
+
+The main page combines a transaction form with a single state machine; on success, a result panel renders card-based sections for a clean enterprise SaaS layout.
+
+```mermaid
+flowchart TB
+    subgraph Main["Main page (single-page MVP)"]
+        FORM[Transaction input form]
+        ST{{Frontend state}}
+    end
+
+    FORM -.->|submit / reset| ST
+
+    ST -->|empty| EMP[Empty state]
+    ST -->|loading| LDG[Loading state]
+    ST -->|error| ERR[Error state]
+    ST -->|success| RP[Result panel]
+
+    RP --> C1[Transaction Summary]
+    RP --> C2[Risk Level]
+    RP --> C3[Flagged Signals]
+    RP --> C4[Recommended Action]
+    RP --> C5[Analyst Summary]
+    RP --> C6[Confidence / Notes]
+```
+
+### Deployment architecture
+
+The browser talks to Vercel for the Next.js UI and API routes; API routes connect to Supabase and the Groq API. Secrets stay server-side.
+
+```mermaid
+flowchart TB
+    B[User / Browser]
+
+    subgraph Vercel["Vercel — hosting"]
+        FE[Next.js frontend]
+        AR[Server-side API routes]
+    end
+
+    SB[(Supabase — database)]
+    GQ[Groq API — external]
+
+    B <-->|HTTPS: pages & assets| FE
+    B <-->|HTTPS: API calls & JSON| AR
+    AR <-->|queries / writes| SB
+    AR <-->|HTTPS: explanation requests| GQ
+```
+
+### System diagram (text)
 
 ```
 ┌─────────────┐     POST JSON      ┌──────────────────────┐
