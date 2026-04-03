@@ -54,15 +54,15 @@ export function RiskReviewExperience() {
 
       <div className="mt-10 space-y-10">
         <section aria-labelledby="input-heading">
-          <div className="mb-4 flex items-center justify-between gap-4">
+          <div className="mb-5 flex items-center justify-between gap-4">
             <div>
               <h2
                 id="input-heading"
-                className="text-sm font-semibold text-slate-800"
+                className="text-base font-bold tracking-tight text-slate-900"
               >
                 Input
               </h2>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1.5 text-xs font-medium text-slate-600">
                 Required fields are validated before submit.
               </p>
             </div>

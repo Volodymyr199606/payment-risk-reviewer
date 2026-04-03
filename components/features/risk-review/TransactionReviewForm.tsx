@@ -62,14 +62,21 @@ function FieldGroup({
   children: ReactNode;
 }) {
   return (
-    <div className="space-y-2.5">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+    <div className="rounded-xl border border-slate-200/95 bg-slate-50/60 p-4 shadow-sm shadow-slate-900/[0.04] transition-[border-color,box-shadow] duration-200 hover:border-slate-300/90 hover:shadow-md hover:shadow-slate-900/[0.06]">
+      <p className="mb-3 flex items-center gap-2.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-700">
+        <span
+          className="h-2 w-2 shrink-0 rounded-sm bg-sky-600/90"
+          aria-hidden
+        />
         {title}
       </p>
-      {children}
+      <div className="space-y-3">{children}</div>
     </div>
   );
 }
+
+const formCardClass =
+  "border-slate-300/95 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/[0.08]";
 
 export function TransactionReviewForm({
   onSubmit,
@@ -107,13 +114,18 @@ export function TransactionReviewForm({
   }
 
   return (
-    <Card variant="default">
-      <p className="text-base font-semibold text-slate-900">Transaction details</p>
-      <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
-        Server-side rules-first evaluation. Use standard currency and country codes.
-      </p>
+    <Card variant="default" className={formCardClass}>
+      <div className="border-b border-slate-200/90 pb-5">
+        <p className="text-lg font-semibold tracking-tight text-slate-900">
+          Transaction details
+        </p>
+        <p className="mt-2 text-xs font-medium leading-relaxed text-slate-600">
+          Server-side rules-first evaluation. Use standard currency and country
+          codes.
+        </p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+      <form onSubmit={handleSubmit} className="mt-6 space-y-5">
         <FieldGroup title="Reference">
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5 sm:col-span-2">
@@ -248,7 +260,7 @@ export function TransactionReviewForm({
           </div>
         </FieldGroup>
 
-        <FieldGroup title="Behavioral signals">
+        <FieldGroup title="Behavioral Signals">
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="space-y-1.5">
               <Label htmlFor="accountAgeDays">Account age (days)</Label>
@@ -304,10 +316,16 @@ export function TransactionReviewForm({
           </p>
         ) : null}
 
-        <div className="mt-1 flex justify-end border-t border-slate-200/90 pt-4">
-          <Button type="submit" disabled={disabled} className="min-w-[180px]">
-            {disabled ? "Evaluating…" : "Run risk review"}
-          </Button>
+        <div className="mt-1 rounded-lg border border-slate-200/80 bg-slate-50/70 px-4 py-5 sm:px-5">
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
+            <Button
+              type="submit"
+              disabled={disabled}
+              className="w-full min-w-0 shadow-lg shadow-slate-900/25 ring-1 ring-slate-900/10 sm:w-auto sm:min-w-[192px]"
+            >
+              {disabled ? "Evaluating…" : "Run risk review"}
+            </Button>
+          </div>
         </div>
       </form>
     </Card>
