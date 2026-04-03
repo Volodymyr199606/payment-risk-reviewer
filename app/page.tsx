@@ -2,7 +2,7 @@ import { RiskReviewExperience } from "@/components/features/risk-review/RiskRevi
 
 export default function Home() {
   return (
-    <main className="min-h-full">
+    <main className="min-h-full bg-[var(--background)]">
       <RiskReviewExperience />
     </main>
   );

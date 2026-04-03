@@ -1,32 +1,46 @@
 import type { RiskReviewResult } from "@/types/review";
 import { TransactionSummaryCard } from "@/components/features/risk-review/TransactionSummaryCard";
-import { RiskLevelCard } from "@/components/features/risk-review/RiskLevelCard";
+import { ReviewOutcomeSection } from "@/components/features/risk-review/ReviewOutcomeSection";
 import { FlaggedSignalsCard } from "@/components/features/risk-review/FlaggedSignalsCard";
-import { RecommendationCard } from "@/components/features/risk-review/RecommendationCard";
 import { AnalystSummaryCard } from "@/components/features/risk-review/AnalystSummaryCard";
 import { ConfidenceCard } from "@/components/features/risk-review/ConfidenceCard";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export function RiskReviewResultPanel({ result }: { result: RiskReviewResult }) {
   const { meta } = result;
   return (
-    <div className="space-y-4">
-      <TransactionSummaryCard transaction={result.transaction} />
-      <RiskLevelCard riskLevel={result.riskLevel} />
-      <FlaggedSignalsCard signals={result.flaggedSignals} />
-      <RecommendationCard recommendation={result.recommendation} />
-      <AnalystSummaryCard text={result.analystSummary} />
-      <ConfidenceCard
-        confidence={result.confidence}
-        notes={result.confidenceNotes}
+    <div className="space-y-10">
+      <ReviewOutcomeSection
+        recommendation={result.recommendation}
+        riskLevel={result.riskLevel}
       />
-      <p className="text-center text-xs text-slate-400">
-        Request {meta.requestId.slice(0, 8)}… ·{" "}
+
+      <FlaggedSignalsCard signals={result.flaggedSignals} />
+
+      <div className="space-y-3">
+        <SectionLabel>Transaction context</SectionLabel>
+        <TransactionSummaryCard transaction={result.transaction} />
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2 lg:gap-8 lg:items-start">
+        <AnalystSummaryCard text={result.analystSummary} />
+        <ConfidenceCard
+          confidence={result.confidence}
+          notes={result.confidenceNotes}
+        />
+      </div>
+
+      <footer className="border-t border-slate-200/80 pt-6 text-center text-[11px] leading-relaxed text-slate-400">
+        <span className="font-mono text-slate-500">
+          {meta.requestId.slice(0, 8)}…
+        </span>
+        {" · "}
         {new Date(meta.evaluatedAt).toLocaleString()}
         {meta.explanationSource ? ` · ${meta.explanationSource}` : ""}
         {meta.persistedReviewId
           ? ` · saved ${meta.persistedReviewId.slice(0, 8)}…`
           : ""}
-      </p>
+      </footer>
     </div>
   );
 }

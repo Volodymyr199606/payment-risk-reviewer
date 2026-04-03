@@ -1,10 +1,10 @@
-import { Card, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 
 export function AnalystSummaryCard({ text }: { text: string }) {
   return (
-    <Card>
-      <CardTitle>Analyst summary</CardTitle>
-      <p className="mt-4 text-sm leading-relaxed text-slate-800">{text}</p>
+    <Card variant="muted" className="h-full p-5 sm:p-6">
+      <p className="text-xs font-semibold text-slate-700">Analyst summary</p>
+      <p className="mt-3 text-sm leading-[1.65] text-slate-700">{text}</p>
     </Card>
   );
 }

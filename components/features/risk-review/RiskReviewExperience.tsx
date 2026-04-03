@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { RiskReviewResult } from "@/types/review";
 import { postReview, ApiError } from "@/lib/api";
 import { Alert } from "@/components/ui/alert";
+import { SectionLabel } from "@/components/ui/section-label";
 import { TransactionReviewForm } from "@/components/features/risk-review/TransactionReviewForm";
 import { RiskReviewResultPanel } from "@/components/features/risk-review/RiskReviewResultPanel";
 import { ResultSkeleton } from "@/components/features/risk-review/ResultSkeleton";
@@ -38,48 +39,78 @@ export function RiskReviewExperience() {
   const showSuccessPanel = phase === "success" && result;
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8">
-      <header className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-          Payment Risk Reviewer
-        </p>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+    <div className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+      <header className="border-b border-slate-200/80 pb-10">
+        <SectionLabel>Payment Risk Reviewer</SectionLabel>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2rem] sm:leading-tight">
           Transaction risk review
         </h1>
-        <p className="max-w-2xl text-sm leading-relaxed text-slate-600">
-          Submit transaction context for a rules-first assessment. Results include
-          risk level, flagged signals, a recommended action, and an analyst-facing
-          summary.
+        <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-slate-600">
+          Enter transaction context for a deterministic rules assessment. The
+          outcome highlights recommended action, risk level, and signals before
+          supporting detail.
         </p>
       </header>
 
-      <TransactionReviewForm
-        onSubmit={handleSubmit}
-        disabled={phase === "loading"}
-      />
-
-      {error && phase === "idle" ? (
-        <Alert tone="error">{error}</Alert>
-      ) : null}
-
-      {showEmpty ? (
-        <Alert tone="info">
-          Run a review to see risk level, signals, recommendation, and confidence
-          in structured cards below.
-        </Alert>
-      ) : null}
-
-      {phase === "loading" ? (
-        <section aria-busy aria-label="Loading review results">
-          <ResultSkeleton />
+      <div className="mt-10 space-y-10">
+        <section aria-labelledby="input-heading">
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <div>
+              <h2
+                id="input-heading"
+                className="text-sm font-semibold text-slate-800"
+              >
+                Input
+              </h2>
+              <p className="mt-1 text-xs text-slate-500">
+                Required fields are validated before submit.
+              </p>
+            </div>
+          </div>
+          <TransactionReviewForm
+            onSubmit={handleSubmit}
+            disabled={phase === "loading"}
+          />
         </section>
-      ) : null}
 
-      {showSuccessPanel && result ? (
-        <section aria-label="Review results">
-          <RiskReviewResultPanel result={result} />
-        </section>
-      ) : null}
+        {error && phase === "idle" ? (
+          <Alert tone="error">{error}</Alert>
+        ) : null}
+
+        {showEmpty ? (
+          <Alert tone="info">
+            Submit the form to see the review outcome: decision first, then
+            signals and context below.
+          </Alert>
+        ) : null}
+
+        {phase === "loading" ? (
+          <section aria-busy aria-label="Loading review results">
+            <div className="mb-4">
+              <SectionLabel>Results</SectionLabel>
+              <p className="mt-1 text-xs text-slate-500">Generating review…</p>
+            </div>
+            <ResultSkeleton />
+          </section>
+        ) : null}
+
+        {showSuccessPanel && result ? (
+          <section aria-labelledby="results-heading" className="space-y-4">
+            <div>
+              <h2
+                id="results-heading"
+                className="text-sm font-semibold text-slate-800"
+              >
+                Results
+              </h2>
+              <p className="mt-1 text-xs text-slate-500">
+                Decision and evidence for this submission.
+              </p>
+            </div>
+            <RiskReviewResultPanel result={result} />
+          </section>
+        ) : null}
+      </div>
     </div>
   );
 }

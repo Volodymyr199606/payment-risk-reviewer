@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { PaymentChannel, TransactionReviewRequest } from "@/types/review";
-import { Card, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -93,11 +93,12 @@ export function TransactionReviewForm({
   }
 
   return (
-    <Card>
-      <CardTitle>Transaction input</CardTitle>
-      <CardDescription>
-        Enter transaction context. Evaluation runs server-side (rules-first).
-      </CardDescription>
+    <Card variant="default">
+      <p className="text-sm font-semibold text-slate-800">Transaction details</p>
+      <p className="mt-1 text-xs leading-relaxed text-slate-500">
+        Evaluation runs server-side (rules-first). Currency and countries use
+        standard codes.
+      </p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
